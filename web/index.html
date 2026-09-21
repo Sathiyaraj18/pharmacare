@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base href="$FLUTTER_BASE_HREF">
+
+    <meta charset="UTF-8">
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+
+    <meta name="description" content="PharmaCare">
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="PharmaCare">
+
+    <link rel="icon" type="image/png" href="favicon.png"/>
+
+    <title>PharmaCare</title>
+
+    <!-- Razorpay Checkout -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- Flutter -->
+    <script>
+        window.startRazorpayCheckout = function (
+          options,
+          onSuccess,
+          onFailure
+        ) {
+          try {
+            console.log("Starting Razorpay Checkout...");
+
+            if (typeof window.Razorpay !== "function") {
+              console.error("Razorpay Checkout script is not loaded.");
+
+              onFailure({
+                message: "Razorpay Checkout script was not loaded."
+              });
+
+              return;
+            }
+
+            /*
+             * Razorpay calls this function after successful payment.
+             */
+            options.handler = onSuccess;
+
+            /*
+             * Create Razorpay instance.
+             */
+            var razorpay = new window.Razorpay(options);
+
+            /*
+             * Payment failed event.
+             */
+            razorpay.on("payment.failed", function (response) {
+              console.error("Razorpay payment failed:", response);
+
+              onFailure({
+                message:
+                  response &&
+                  response.error &&
+                  response.error.description
+                    ? response.error.description
+                    : "Payment failed."
+              });
+            });
+
+            /*
+             * Open Razorpay Checkout.
+             */
+            razorpay.open();
+
+          } catch (error) {
+            console.error("Razorpay Checkout Error:", error);
+
+            onFailure({
+              message:
+                error && error.message
+                  ? error.message
+                  : "Unable to open Razorpay Checkout."
+            });
+          }
+        };
+
+        console.log(
+          "PharmaCare Razorpay bridge loaded:",
+          typeof window.startRazorpayCheckout
+        );
+    </script>
+</head>
+
+<body>
+
+<script src="flutter_bootstrap.js" async></script>
+
+</body>
+</html>
